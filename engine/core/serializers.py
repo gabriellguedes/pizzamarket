@@ -1,6 +1,20 @@
 from rest_framework import serializers
-from .models import Pedido, ItemPedido, Produto
+from .models import Categoria, Produto, Pedido, ItemPedido
 from django.db import transaction # Para garantir que se algo der errado, nada seja salvo
+
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = ['id', 'nome']
+
+class ProdutoSerializer(serializers.ModelSerializer):
+    # Mostra o nome da categoria em vez de apenas o ID
+    categoria_nome = serializers.ReadOnlyField(source='categoria.nome')
+
+    class Meta:
+        model = Produto
+        fields = ['id', 'nome', 'descricao', 'preco', 'imagem', 'disponivel', 'categoria', 'categoria_nome']
+
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
     nome_produto = serializers.ReadOnlyField(source='produto.nome')
@@ -46,3 +60,5 @@ class PedidoSerializer(serializers.ModelSerializer):
             pedido.save()
             
         return pedido
+    
+
