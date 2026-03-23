@@ -1,9 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PedidoViewSet # Certifique-se de que a View já existe
+from .views import ProdutoViewSet, PedidoViewSet # Importe suas views
 
 router = DefaultRouter()
-router.register(r'pedidos', PedidoViewSet)
+router.register(r'produtos', ProdutoViewSet, basename='produto')
+router.register(r'pedidos', PedidoViewSet, basename='pedido')
 
 urlpatterns = [
     path('', include(router.urls)),
