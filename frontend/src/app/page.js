@@ -7,6 +7,8 @@ export default function Home() {
   const [pizzas, setPizzas] = useState([]); // Começa vazio
   const [carrinho, setCarrinho] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
+  const [dadosPix, setDadosPix] = useState(null);
+
   const [cliente, setCliente] = useState({
     nome: "",
     whatsapp: "",
@@ -16,7 +18,7 @@ export default function Home() {
 
   // Função que busca os dados na API
   useEffect(() => {
-    fetch("http://192.168.100.7:8000/api/produtos/") // Ajuste para a URL da API
+    fetch("http://localhost:8000/api/produtos/") // Ajuste para a URL da API
       .then((response) => response.json())
       .then((data) => {
         setPizzas(data);
@@ -64,7 +66,7 @@ export default function Home() {
 
     try {
       /* Set path of your API*/
-      const response = await fetch("http://192.168.100.7:8000/api/pedidos/", {
+      const response = await fetch("http://localhost:8000/api/pedidos/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dadosPedido),
@@ -72,9 +74,10 @@ export default function Home() {
 
       if (response.ok) {
         const pedidoCriado = await response.json();
-        alert(
-          `Pedido #${pedidoCriado.id} enviado com sucesso! Agora vamos para o pagamento.`,
-        );
+        setDadosPix({
+          copiaCola: pedidoCriado.pix_copia_e_cola,
+          imagem: pedidoCriado.pix_qr_64,
+        });
         setModalAberto(false);
         setCarrinho([]); // Limpa o carrinho
       } else {
@@ -125,64 +128,145 @@ export default function Home() {
       )}
 
       {modalAberto && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6">Finalizar Pedido</h2>
-            <form onSubmit={enviarPedido} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Seu Nome
-                </label>
-                <input
-                  required
-                  className="w-full border p-3 rounded-lg mt-1"
-                  onChange={(e) =>
-                    setCliente({ ...cliente, nome: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  WhatsApp
-                </label>
-                <input
-                  required
-                  placeholder="(00) 00000-0000"
-                  className="w-full border p-3 rounded-lg mt-1"
-                  onChange={(e) =>
-                    setCliente({ ...cliente, whatsapp: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Endereço de Entrega
-                </label>
-                <textarea
-                  required
-                  className="w-full border p-3 rounded-lg mt-1"
-                  onChange={(e) =>
-                    setCliente({ ...cliente, endereco: e.target.value })
-                  }
-                />
-              </div>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative">
+            {/* Botão de Fechar no topo direito */}
+            <button
+              onClick={() => {
+                setModalAberto(false);
+                setDadosPix(null);
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
 
-              <div className="flex gap-4 pt-4">
+            {!dadosPix ? (
+              /* --- PARTE 1: O FORMULÁRIO (Aparece primeiro) --- */
+              <>
+                <h2 className="text-2xl font-bold mb-2 text-gray-800">
+                  Finalizar Pedido
+                </h2>
+                <p className="text-sm text-gray-500 mb-6">
+                  Preencha seus dados para entrega.
+                </p>
+
+                <form onSubmit={enviarPedido} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-400">
+                      Nome
+                    </label>
+                    <input
+                      required
+                      className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-red-500 transition-colors"
+                      onChange={(e) =>
+                        setCliente({ ...cliente, nome: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-400">
+                      WhatsApp
+                    </label>
+                    <input
+                      required
+                      placeholder="(00) 00000-0000"
+                      className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-red-500 transition-colors"
+                      onChange={(e) =>
+                        setCliente({ ...cliente, whatsapp: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-400">
+                      Endereço Completo
+                    </label>
+                    <textarea
+                      required
+                      rows="2"
+                      className="w-full border-b-2 border-gray-100 py-2 outline-none focus:border-red-500 transition-colors resize-none"
+                      onChange={(e) =>
+                        setCliente({ ...cliente, endereco: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-red-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-red-700 shadow-lg shadow-red-200 transition-all mt-4"
+                  >
+                    Confirmar e Gerar PIX
+                  </button>
+                </form>
+              </>
+            ) : (
+              /* --- PARTE 2: O QR CODE (Aparece após o POST com sucesso) --- */
+              <div className="text-center animate-fade-in">
+                <div className="mb-4 inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full">
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 13l4 4L19 7"
+                    ></path>
+                  </svg>
+                </div>
+
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Pedido Recebido!
+                </h2>
+                <p className="text-gray-500 mb-6 text-sm">
+                  Escaneie o código abaixo para pagar:
+                </p>
+
+                {/* QR Code dinâmico vindo do Django */}
+                <div className="bg-gray-50 p-4 rounded-2xl inline-block border-2 border-dashed border-gray-200">
+                  <img
+                    src={`data:image/jpeg;base64,${dadosPix.pix_qr_64}`}
+                    className="w-48 h-48 mx-auto"
+                    alt="QR Code Pix"
+                  />
+                </div>
+
+                <div className="mt-6 text-left">
+                  <label className="text-xs font-bold text-gray-400 uppercase">
+                    Pix Copia e Cola
+                  </label>
+                  <div className="flex mt-1">
+                    <input
+                      readOnly
+                      value={dadosPix.pix_copia_e_cola}
+                      className="flex-1 bg-gray-100 p-3 rounded-l-lg text-xs truncate border-none focus:ring-0"
+                    />
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(dadosPix.copiaCola)
+                      }
+                      className="bg-gray-200 px-4 rounded-r-lg hover:bg-gray-300 transition-colors"
+                    >
+                      📋
+                    </button>
+                  </div>
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => setModalAberto(false)}
-                  className="flex-1 bg-gray-200 py-3 rounded-lg font-bold"
+                  onClick={() => {
+                    setModalAberto(false);
+                    setDadosPix(null);
+                    setCarrinho([]);
+                  }}
+                  className="mt-8 w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all"
                 >
-                  Voltar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
-                >
-                  Confirmar e Pagar
+                  Fechar e Voltar ao Início
                 </button>
               </div>
-            </form>
+            )}
           </div>
         </div>
       )}
