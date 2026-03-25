@@ -21,5 +21,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+     # Rotas de Autenticação API
+    path('api/accounts/', include('engine.accounts.urls')),
+    
+    # Rotas do Allauth (Login Social e fluxos padrão)
+    path('accounts/', include('allauth.urls')),
     path('api/', include('engine.core.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

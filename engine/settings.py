@@ -38,6 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Django AllAuth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',   
+    'allauth.socialaccount.providers.facebook', 
     #My APPs
     'engine.accounts',
     'engine.core',
@@ -58,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'engine.urls'
@@ -109,11 +117,38 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ACCOUNTS
+SITE_ID = 1
+
+# Configurações do Allauth
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Define que o login será feito EXCLUSIVAMENTE por e-mail
+ACCOUNT_LOGIN_METHODS = {'email'}
+
+
+# Define quais campos aparecerão e serão obrigatórios no cadastro.
+# O '*' indica que o campo é obrigatório. 
+ACCOUNT_SIGNUP_FIELDS = {
+    'email': {'flags': ['required', 'unique']},
+    'username': {'flags': ['required', 'unique']},
+    'cpf': {'flags': ['required', 'unique']},
+    'telefone': {'flags': ['required']},
+}
+# Mantemos estas para garantir o comportamento desejado
+#ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+SILENCED_SYSTEM_CHECKS = ["account.W001"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'UTC'
 
@@ -133,3 +168,21 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # TOKEN SDK Mercado Pago
 MERCADOPAGO_TOKEN = config('MERCADOPAGO_ACCESS_TOKEN')
+
+# SOCIAL ACCOUNTS LOGIN
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_SECRET'),
+            'key': ''
+        }
+    },
+    'facebook': {
+        'APP': {
+            'client_id': config('FB_CLIENT_ID'),
+            'secret': config('FB_SECRET'),
+            'key': ''
+        }
+    }
+}
