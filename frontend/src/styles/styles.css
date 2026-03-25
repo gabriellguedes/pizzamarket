@@ -1,0 +1,79 @@
+/* src/styles/globals.css */
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Reset básico para garantir que o layout ocupe a tela toda */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- REGRAS DE IMPRESSÃO DO CUPOM --- */
+@media print {
+  /* Esconde tudo da tela (fundo escuro, botões, etc) */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Mostra APENAS o cupom que clicamos e os seus filhos */
+  .print-active,
+  .print-active * {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .print-active {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    background: white;
+    color: black;
+    padding: 10px;
+  }
+  /* Esconde o rodapé e cabeçalho que o navegador coloca (data, url) */
+  @page {
+    margin: 0;
+  }
+}

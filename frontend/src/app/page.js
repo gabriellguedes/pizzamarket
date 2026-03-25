@@ -74,11 +74,8 @@ export default function Home() {
 
       if (response.ok) {
         const pedidoCriado = await response.json();
-        setDadosPix({
-          copiaCola: pedidoCriado.pix_copia_e_cola,
-          imagem: pedidoCriado.pix_qr_64,
-        });
-        setModalAberto(false);
+        setDadosPix(pedidoCriado);
+
         setCarrinho([]); // Limpa o carrinho
       } else {
         alert("Erro ao enviar pedido. Verifique os dados.");
