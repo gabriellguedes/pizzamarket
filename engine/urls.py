@@ -27,4 +27,5 @@ urlpatterns = [
     # Rotas do Allauth (Login Social e fluxos padrão)
     path('accounts/', include('allauth.urls')),
     path('api/', include('engine.core.urls')),
+    path('api/payments/', include('engine.payments.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
