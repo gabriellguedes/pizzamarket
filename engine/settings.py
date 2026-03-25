@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #My APPs
+    'engine.accounts',
     'engine.core',
+    'engine.orders',
+    'engine.payments',
+    'engine.products',
     #REST Framework
     'rest_framework',
     'corsheaders',
