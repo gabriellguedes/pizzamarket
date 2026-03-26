@@ -142,6 +142,8 @@ ACCOUNT_SIGNUP_FIELDS = {
 #ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+# Adcionando o campo CPF como campo obrigario.
+SOCIALACCOUNT_ADAPTER = 'engine.accounts.adapter.MySocialAccountAdapter'
 
 SILENCED_SYSTEM_CHECKS = ["account.W001"]
 

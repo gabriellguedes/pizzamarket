@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 from .models import User
 
@@ -14,8 +15,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'password', 'cpf', 'telefone']
 
+    def validate_cpf(self, value):
+        # Remove pontos e traços
+        cpf = re.sub(r'[^0-9]', '', value)
+        
+        if len(cpf) != 11:
+            raise serializers.ValidationError("O CPF deve ter 11 dígitos.")
+        
+        # Aqui você poderia adicionar a lógica real de validação de dígito verificador
+        return cpf
+
     def create(self, validated_data):
-        # Cria o usuário usando o método create_user para criptografar a senha corretamente
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
